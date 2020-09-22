@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:padding="10dp"
+    android:layout_height="wrap_content">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvDeviceName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text="Device Name"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvRssi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rssi:0dBm" />
+
+            <Switch
+                android:id="@+id/switchNotify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="接收数据通知" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/tvReceiveTimeLen"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text="总接收时长:0ms" />
+
+            <TextView
+                android:id="@+id/tvReceiveSpeed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text="接收速度:0byte/s" />
+
+            <TextView
+                android:id="@+id/tvTotalData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="接收总数据:0byte" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="保存到文件:" />
+
+                <EditText
+                    android:id="@+id/etFileName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:textSize="14sp"
+                    android:hint="请输入文件名" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=".txt" />
+
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="15dp"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="开始保存" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnClear"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="清空" />
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/tvData"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:scrollbars="vertical"
+        android:background="@drawable/shape_blue_stroke" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="10dp"
+        android:layerType="software"
+        android:background="@drawable/shape_dotted_line_blue" />
+
+</LinearLayout>

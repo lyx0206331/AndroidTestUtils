@@ -1,0 +1,6 @@
+include ':blemodule'
+include ':FastBleLib'
+include ':CommonLib'
+include ':usbmodule'
+include ':app'
+rootProject.name = "AndroidTestUtils"
