@@ -2,15 +2,14 @@ package com.adrian.usbmodule
 
 import android.Manifest
 import android.hardware.usb.UsbDevice
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.text.method.ScrollingMovementMethod
+import androidx.appcompat.app.AppCompatActivity
 import com.chwishay.commonlib.tools.PermissionUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
-import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,19 +21,35 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
 
+    //接收数据总大小
     private var totalDataLength = 0
+
+    //文件创建时间
     private var createTime = 0L
+
+    //数据传输开始时间
+    private var transStartTime = 0L
+
+    //数据传输结束时间
+    private var transStopTime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        UsbUtil.instance.init(this).logCallback = object : UsbUtil.ILogCallback {
+        UsbUtil.instance.init(this).usbCallback = object : UsbUtil.IUsbCallback {
             override fun outputLog(msg: String?) {
                 appendCotent(msg)
             }
 
             override fun outputData(bytes: ByteArray) {
+                if (bytes.isEmpty()) {
+                    transStopTime = System.currentTimeMillis()
+                    appendCotent("结束数据传输:$transStopTime")
+                } else if (transStartTime == 0L) {
+                    transStartTime = System.currentTimeMillis()
+                    appendCotent("开始传输数据:$transStartTime")
+                }
                 totalDataLength += bytes.size
                 writeSrc2File("w66_$createTime", bytes)
             }
@@ -63,11 +78,14 @@ class MainActivity : AppCompatActivity() {
                         if (UsbUtil.instance.isReading) {
                             btnReadData.text = "开始读取"
                             UsbUtil.instance.isReading = false
-                            appendCotent("收到数据大小为:$totalDataLength bytes")
+                            val timeLen = (System.currentTimeMillis() - transStartTime) / 1000f
+                            appendCotent("收到数据大小为:$totalDataLength bytes, 传输耗时:$timeLen s")
+                            appendCotent("速度约为:${totalDataLength / 1024f / timeLen}kb/s")
                         } else {
                             btnReadData.text = "停止读取"
                             UsbUtil.instance.isReading = true
                             totalDataLength = 0
+                            transStartTime = 0L
                             createTime = System.currentTimeMillis()
                             UsbUtil.instance.readMsg(usbDevice)
                         }
@@ -77,6 +95,10 @@ class MainActivity : AppCompatActivity() {
                         permissionUtil.showTips("当前手机需要读写文件权限，是否手动设置?")
                     }
                 })
+        }
+
+        btnClearLog.setOnClickListener {
+            tvContent.text = ""
         }
 
         tvContent.movementMethod = ScrollingMovementMethod.getInstance()

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.*
-import com.chwishay.commonlib.tools.formatHexString
 import com.chwishay.commonlib.tools.logE
 import com.chwishay.commonlib.tools.orDefault
 import com.chwishay.commonlib.tools.showShortToast
@@ -66,7 +65,7 @@ class UsbUtil {
 
     private var isOpenPort = false
 
-    var logCallback: ILogCallback? = null
+    var usbCallback: IUsbCallback? = null
 
     fun init(context: Context): UsbUtil {
         this.context = context
@@ -81,7 +80,7 @@ class UsbUtil {
             it.iterator().apply {
                 while (hasNext()) {
                     val usbDevice = this.next().value
-                    logCallback?.outputLog("device name:${usbDevice.deviceName}")
+                    usbCallback?.outputLog("device name:${usbDevice.deviceName}")
                     devices.add(usbDevice)
                 }
             }
@@ -108,15 +107,15 @@ class UsbUtil {
     fun requestPermission(usbDevice: UsbDevice) {
         if (hasPermission(usbDevice)) {
             context.showShortToast("已获得USB权限")
-            logCallback?.outputLog("已获得USB权限")
+            usbCallback?.outputLog("已获得USB权限")
         } else {
             if (permissionIntent != null) {
                 usbMngr?.requestPermission(usbDevice, permissionIntent)
                 context.showShortToast("请求USB权限")
-                logCallback?.outputLog("请求USB权限")
+                usbCallback?.outputLog("请求USB权限")
             } else {
                 context.showShortToast("请注册USB广播")
-                logCallback?.outputLog("请注册USB广播")
+                usbCallback?.outputLog("请注册USB广播")
             }
         }
     }
@@ -126,7 +125,7 @@ class UsbUtil {
             isOpenPort = false
             return false
         }
-        logCallback?.outputLog("usb interface count: ${device.interfaceCount}")
+        usbCallback?.outputLog("usb interface count: ${device.interfaceCount}")
         usbInterface = device.getInterface(1)
         if (hasPermission(device)) {
             usbConnection = usbMngr?.openDevice(device)
@@ -136,11 +135,11 @@ class UsbUtil {
             }
             if (usbConnection!!.claimInterface(usbInterface, true)) {
                 context.showShortToast("找到USB设备接口")
-                logCallback?.outputLog("找到USB设备接口")
+                usbCallback?.outputLog("找到USB设备接口")
             } else {
                 usbConnection!!.close()
                 context.showShortToast("未找到USB设备接口")
-                logCallback?.outputLog("未找到USB设备接口")
+                usbCallback?.outputLog("未找到USB设备接口")
                 isOpenPort = false
                 return false
             }
@@ -155,10 +154,10 @@ class UsbUtil {
             if (end.type == UsbConstants.USB_ENDPOINT_XFER_BULK) {
                 if (end.direction == UsbConstants.USB_DIR_IN) {
                     usbEndpointIn = end
-                    logCallback?.outputLog("找到输入接口")
+                    usbCallback?.outputLog("找到输入接口")
                 } else {
                     usbEndpointOut = end
-                    logCallback?.outputLog("找到输出接口")
+                    usbCallback?.outputLog("找到输出接口")
                 }
             }
         }
@@ -184,14 +183,16 @@ class UsbUtil {
 
     fun readMsg(device: UsbDevice?) {
         if (isOpenPort || openPort(device)) {
-            logCallback?.outputLog("开始读取数据")
+            usbCallback?.outputLog("开始读取数据")
             isReading = true
+            val inMax = usbEndpointIn!!.maxPacketSize * 80
+            usbCallback?.outputLog("inMax:${inMax}bytes")
+            val request = UsbRequest()
+            request.initialize(usbConnection, usbEndpointIn)
+            val byteBuffer = ByteBuffer.allocateDirect(inMax)
+            byteBuffer.order(ByteOrder.LITTLE_ENDIAN)
+            var cycleTimes = 0
             thread(start = true) {
-                val inMax = usbEndpointIn!!.maxPacketSize*40
-                val buffer = ByteBuffer.allocateDirect(inMax)
-                buffer.order(ByteOrder.BIG_ENDIAN)
-                val request = UsbRequest()
-                request.initialize(usbConnection, usbEndpointIn)
                 while (isReading) {
                     synchronized(this) {
 //                        val bytes = ByteArray(usbEndpointIn!!.maxPacketSize) {0}
@@ -201,12 +202,36 @@ class UsbUtil {
 ////                            logCallback?.outputLog(bytes.contentToString())
 //                            logCallback?.outputData(bytes)
 //                        }
-                        request.queue(buffer, inMax)
-                        val bytes = buffer.array().filterNot {
-                            it == null
-                        }.toByteArray()
-                        if (usbConnection?.requestWait() == request && bytes.isNotEmpty()) {
-                            logCallback?.outputData(bytes)
+//                        "USB".logE("buffer size:${byteBuffer.capacity()}, remaining:${byteBuffer.remaining()}, position:${byteBuffer.position()}, limit:${byteBuffer.limit()}, 时间：${System.currentTimeMillis()}")
+                        if (request.queue(byteBuffer, inMax)) {
+                            if (usbConnection?.requestWait() == request) {
+//                                if (cycleTimes == 0) {
+//                                    byteBuffer.put(0, 0x45)
+//                                    byteBuffer.put(1, 0x45)
+//                                    byteBuffer.put(2, 0x45)
+//                                    byteBuffer.put(3, 0x45)
+//                                } else if (cycleTimes == 1) {
+//                                    byteBuffer.put(4, 0x46)
+//                                    byteBuffer.put(5, 0x46)
+//                                    byteBuffer.put(6, 0x46)
+//                                    byteBuffer.put(7, 0x46)
+//                                }
+                                cycleTimes++
+                                byteBuffer.flip()
+                                val bytes = ByteArray(byteBuffer.limit())
+                                byteBuffer.get(bytes)
+                                byteBuffer.clear()
+                                val size = bytes.size
+                                "USB".logE(
+                                    "第$cycleTimes 次读取数据 bytes size:$size, last byte:${
+                                        if (size >= 4) bytes.copyOfRange(
+                                            size - 4,
+                                            size
+                                        ).decodeToString() else "长度不足4个字节"
+                                    }, 时间：${System.currentTimeMillis()}"
+                                )
+                                usbCallback?.outputData(bytes)
+                            }
                         }
                     }
                 }
@@ -252,7 +277,7 @@ class UsbUtil {
         }
     }
 
-    interface ILogCallback {
+    interface IUsbCallback {
         fun outputLog(msg: String?)
         fun outputData(bytes: ByteArray)
     }

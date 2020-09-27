@@ -2,7 +2,10 @@ package com.adrian.blemodule
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.method.ScrollingMovementMethod
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,16 +14,20 @@ import android.widget.EditText
 import android.widget.Switch
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.chwishay.commonlib.tools.logE
 import com.chwishay.commonlib.tools.orDefault
 import com.chwishay.commonlib.tools.showShortToast
 import com.clj.fastble.BleManager
 import com.clj.fastble.callback.BleNotifyCallback
+import com.clj.fastble.callback.BleRssiCallback
 import com.clj.fastble.exception.BleException
 import com.clj.fastble.utils.HexUtil
 import org.jetbrains.anko.find
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.sdk27.coroutines.onCheckedChange
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 //                       _ooOoo_
 //                      o8888888o
@@ -71,6 +78,8 @@ class NotifyAdapter(val context: Context) :
             notifyDataSetChanged()
         }
 
+    val exec by lazy { ScheduledThreadPoolExecutor(1) }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotifyViewHolder {
         return NotifyViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.item_bt_notify, parent, false)
@@ -82,6 +91,31 @@ class NotifyAdapter(val context: Context) :
         bleDeviceInfo?.bleDevice?.apply {
             holder.tvDevName.text = "$name($mac)"
             holder.tvRssi.text = "信号强度:${rssi}dBm"
+            exec.scheduleAtFixedRate({
+                BleManager.getInstance().readRssi(this, object : BleRssiCallback() {
+                    override fun onRssiFailure(exception: BleException?) {
+                        "BLE".logE("信号读取失败")
+                    }
+
+                    override fun onRssiSuccess(rssi: Int) {
+//                        "BLE".logE("信号强度:${rssi}dBm")
+                        val colorResId = when {
+                            rssi >= -60 -> R.color.green01FD01
+                            rssi >= -70 -> R.color.yellowEAB11D
+                            rssi >= -80 -> R.color.redFE0000
+                            else -> R.color.brownD95218
+                        }
+                        val ssb = SpannableStringBuilder("信号强度:${rssi}dBm")
+                        ssb.setSpan(
+                            ForegroundColorSpan(context.resources.getColor(colorResId)),
+                            4,
+                            holder.tvRssi.text.length,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                        holder.tvRssi.text = ssb
+                    }
+                })
+            }, 1000, 1000, TimeUnit.MILLISECONDS)
             BleManager.getInstance().getBluetoothGatt(this).services.let {
                 it.forEachIndexed { index, bluetoothGattService ->
                     if (index == it.size - 1) {
