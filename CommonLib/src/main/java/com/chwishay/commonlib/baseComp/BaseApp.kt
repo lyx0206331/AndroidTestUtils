@@ -1,6 +1,7 @@
 package com.chwishay.commonlib.baseComp
 
 import android.app.Application
+import com.chwishay.commonlib.tools.UncaughtCrashHandler
 
 //  ┏┓　　　┏┓
 //┏┛┻━━━┛┻┓
@@ -32,5 +33,7 @@ open class BaseApp: Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        UncaughtCrashHandler.instance.init(this)
     }
 }

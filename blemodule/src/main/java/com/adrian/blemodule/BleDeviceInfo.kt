@@ -2,12 +2,18 @@ package com.adrian.blemodule
 
 import android.os.Environment
 import android.util.Log
+import com.adrian.blemodule.CmdUtil.parseImuData
+import com.chwishay.commonlib.tools.formatDateString
 import com.chwishay.commonlib.tools.orDefault
-import com.chwishay.commonlib.tools.read2FloatBE
 import com.clj.fastble.data.BleDevice
 import com.clj.fastble.utils.HexUtil
+import io.netty.buffer.Unpooled
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.*
-import kotlin.concurrent.thread
+import java.nio.ByteOrder
+import java.util.*
 
 //                       _ooOoo_
 //                      o8888888o
@@ -36,15 +42,19 @@ import kotlin.concurrent.thread
  * description:
  */
 class BleDeviceInfo(val bleDevice: BleDevice) {
-    var startTime = 0L
+
+    var serviceUUID: UUID? = null
+    var notifyUUID: UUID? = null
+
+    private var startTime = 0L
     var speed: Int = 0
     var totalSize: Int = 0
 
     //上一秒总大小
-    var lastSecondTotalSize = 0
+    private var lastSecondTotalSize = 0
 
     //最后一次包大小
-    var lastDataSize = 0
+    private var lastDataSize = 0
         set(value) {
             field = value
             val timeLen = System.currentTimeMillis() - startTime
@@ -66,8 +76,11 @@ class BleDeviceInfo(val bleDevice: BleDevice) {
             field = value
             lastDataSize = field?.size.orDefault()
             if (needSave && !fileName.isNullOrEmpty()) {
-                writeStr2File(fileName!!, field, true)
-                writeStr2File(fileName!!, field, false)
+
+                dataCache.capacity(dataCache.capacity() + lastDataSize)
+                dataCache.writeBytes(lastData)
+//                writeStr2File(fileName!!, field, true)
+//                writeStr2File(fileName!!, field, false)
             }
         }
 
@@ -76,25 +89,34 @@ class BleDeviceInfo(val bleDevice: BleDevice) {
         set(value) {
             field = value
             if (field) {
+                dataCache.clear()
                 startSaveTime = System.currentTimeMillis()
                 totalReceiveTime = 0L
             } else {
                 stopSaveTime = System.currentTimeMillis()
+                runBlocking {
+                    writeStr2File(fileName!!, dataCache.array(), true)
+                }
             }
         }
     private var startSaveTime = 0L
     private var stopSaveTime = 0L
     var fileName: String = "${System.currentTimeMillis()}"
         set(value) {
-            field = "${value}_$startSaveTime"
+            field = "${value}_${startSaveTime.formatDateString("yyyy-MM-dd-HH_mm_ss")}"
         }
     var filePath: String? = null
+
     //数据总接收时长，数据保存记录状态下，只累计接收数据时段时长，但每次重新保存记录会清零(ms)
     var totalReceiveTime = 0L
+
     //开始接收数据时间(ms)
     private var startReceiveTime = 0L
+
     //停止接收数据时间(ms)
     private var stopReceiveTime = 0L
+
+    private val dataCache = Unpooled.buffer(0).apply { order(ByteOrder.LITTLE_ENDIAN) }
 
     /**
      * 开始接收数据
@@ -116,54 +138,31 @@ class BleDeviceInfo(val bleDevice: BleDevice) {
     }
 
     /**
-     * 保存原始文件
+     * 保存文件
      */
-    private fun writeSrc2File(fileName: String, data: ByteArray?) {
+    private suspend fun writeStr2File(
+        fileName: String,
+        data: ByteArray?,
+        needParse: Boolean = true
+    ) {
         if (data == null) return
-        thread {
-            val file = checkFileExists(fileName)
-            FileOutputStream(file, true).apply {
-                write(data)
-                close()
-            }
-        }
-
-    }
-
-    /**
-     * 保存十六进制字符串文件
-     */
-    private fun writeStr2File(fileName: String, data: ByteArray?, isSrc: Boolean = true) {
-        if (data == null) return
-        thread {
-
-            val content = if (isSrc) "${HexUtil.formatHexString(data, true)}\n" else {
-                if (data.size >= 35) {
-                    val frameCount = data.size / 35
-                    val sb = StringBuilder()
-                    for (i in 0 until frameCount) {
-                        val result = FloatArray(18) { 0f }
-                        val baseOffset = i * 35
-                        result[2] = data.read2FloatBE(baseOffset + 7)
-                        result[3] = data.read2FloatBE(baseOffset + 11)
-                        result[4] = data.read2FloatBE(baseOffset + 15)
-                        result[8] = data.read2FloatBE(baseOffset + 22)
-                        result[9] = data.read2FloatBE(baseOffset + 26)
-                        result[10] = data.read2FloatBE(baseOffset + 30)
-                        val str = "${result.contentToString().replace(",", "")}"
-//                        "RST".logE(str)
-                        sb.append("${str.subSequence(1, str.lastIndex)}\n")
+        withContext(Dispatchers.IO) {
+            data?.parseImuData()?.also { entity ->
+                val origFile = checkFileExists("${fileName}_orig")
+                origFile.bufferedWriter().use {
+                    entity.origList.forEach { byteArray ->
+                        val format = "${HexUtil.formatHexString(byteArray, true)}\n"
+                        it.write(format)
                     }
-                    "$sb"
-                } else {
-                    "${HexUtil.formatHexString(data, true)}\n"
                 }
-            }
-//            "DATA".logE("$content")
-            val file = checkFileExists(if (isSrc) "${fileName}_src" else "${fileName}_rst")
-            BufferedWriter(OutputStreamWriter(FileOutputStream(file, true))).apply {
-                write(content)
-                close()
+                if (needParse) {
+                    val resultFile = checkFileExists("${fileName}_rst")
+                    resultFile.bufferedWriter().use {
+                        entity.resultList.forEach { imuData ->
+                            it.write("${imuData.valuesString()}\n")
+                        }
+                    }
+                }
             }
         }
     }

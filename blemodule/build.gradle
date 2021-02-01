@@ -8,8 +8,8 @@ android {
 
     defaultConfig {
         applicationId "com.adrian.blemodule"
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -20,11 +20,54 @@ android {
         dataBinding = true
     }
 
-    buildTypes {
+    signingConfigs {
+        //AS4.0此设置命名为debug时会导致不能创建Activity
+//        dev {
+//            storeFile file(debugKey)
+//            // No debug config
+//        }
+
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            storeFile file(releaseKey)
+            storePassword KEY_PWD
+            keyAlias ALIAS_NAME
+            keyPassword ALIAS_PWD
         }
+    }
+
+    buildTypes {
+        debug {
+            // 显示Log
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+
+            versionNameSuffix "-debug"
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+        }
+
+        release {
+            // 不显示Log
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+
+            minifyEnabled true
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+
+            applicationVariants.all { variant ->
+                variant.outputs.all { output ->
+                    def fileName = "BleTest_v${defaultConfig.versionName}_${releaseTime()}_${variant.buildType.name}.apk"
+                    outputFileName = fileName
+                }
+
+            }
+        }
+
+        lintOptions { abortOnError false }
     }
 
     compileOptions {
@@ -42,16 +85,25 @@ android {
     }
 }
 
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation rootProject.ext.dependencies.androidXCore
     implementation rootProject.ext.dependencies.androidXMaterial
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation rootProject.ext.dependencies.androidXLifecycleRuntime
+    implementation rootProject.ext.dependencies.androidXLifecycleViewModelKtx
+    implementation rootProject.ext.dependencies.androidXLifecycleLiveDataKtx
+    implementation rootProject.ext.dependencies.MPAndroidChart
+    implementation 'androidx.appcompat:appcompat:1.1.0@aar'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation project(path: ':FastBleLib')
     implementation project(path: ':CommonLib')
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation rootProject.ext.dependencies.ankoAll
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

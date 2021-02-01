@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewmodel"
+            type="com.adrian.blemodule.livedata.BleDataVM" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".BleNotifyActivity">
+
+        <LinearLayout
+            android:id="@+id/llSendCmd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/rvNotify"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/etInputCmd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1.0"
+                android:hint="请输入十六进制指令"
+                android:singleLine="true" />
+
+            <Button
+                android:id="@+id/btnSend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="发送" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/vDottedLine"
+            android:layout_width="match_parent"
+            android:layout_height="1.5dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/shape_dotted_line_blue"
+            android:layerType="software"
+            app:layout_constraintBottom_toTopOf="@id/rvNotify"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llSendCmd" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvNotify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vDottedLine"
+            tools:listitem="@layout/item_bt_notify" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

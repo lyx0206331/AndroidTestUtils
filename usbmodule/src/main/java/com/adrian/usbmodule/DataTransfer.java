@@ -91,7 +91,7 @@ public class DataTransfer {
         byte[] dest = new byte[len];  
         // 为了防止修改源数组，将源数组拷贝一份副本  
         System.arraycopy(b, 0, dest, 0, len);
-        byte temp;  
+        byte temp;
         // 将顺位第i个与倒数第i个交换  
         for (int i = 0; i < len / 2; ++i) {  
             temp = dest[i];  

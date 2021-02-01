@@ -3,11 +3,11 @@ ext {
     isModule = true
     //applicationId版本好sdkVersion统一管理
     android = [
-            compileSdkVersion           : 29,
-            buildToolsVersion           : "29.0.3",
+            compileSdkVersion           : 30,
+            buildToolsVersion           : "30.0.3",
             applicationId               : "com.chwishay.chwsp00",
             minSdkVersion               : 21,
-            targetSdkVersion            : 29,
+            targetSdkVersion            : 30,
             versionCode                 : 1,
             versionName                 : "1.0",
             testInstrumentationRunner   : "androidx.test.runner.AndroidJUnitRunner"
@@ -48,6 +48,7 @@ ext {
     def X_NAV_UI_VERSION = "2.3.0"
 
     def X_ROOM_VERSION = "2.2.5"
+    def X_LIFECYCLE_VERSION = "2.2.0"
 
     def ANKO_VERSION = "0.10.8"
 
@@ -62,6 +63,8 @@ ext {
     def UMSDK_COMMON_VERSION = "9.1.0"
 
     def CHANGELOG_VERSION = "1.2.2"
+
+    def COROUTINES_VERSION = "1.3.3"
 
     dependencies = [
             androidJUnit            : 'junit:junit:' + JUNIT_VERSION,
@@ -108,7 +111,18 @@ ext {
             // optional - Guava support for Room, including Optional and ListenableFuture
             androidXRoomGuava       : 'androidx.room:room-guava:' + X_ROOM_VERSION,
 
+            //Lifecycle
+            androidXLifecycleRuntime: 'androidx.lifecycle:lifecycle-runtime:' + X_LIFECYCLE_VERSION,
+            androidXLifecycleJava8  : 'androidx.lifecycle:lifecycle-common-java8:' + X_LIFECYCLE_VERSION,
+            androidXLifecycleCompiler: 'androidx.lifecycle:lifecycle-compiler:' + X_LIFECYCLE_VERSION,
+            androidXLifecycleViewModelKtx: 'androidx.lifecycle:lifecycle-viewmodel-ktx:' + X_LIFECYCLE_VERSION,
+            androidXLifecycleLiveDataKtx: 'androidx.lifecycle:lifecycle-livedata-ktx:' + X_LIFECYCLE_VERSION,
+
             ankoAll                 : 'org.jetbrains.anko:anko:' + ANKO_VERSION,
+
+            coroutinesCore          : 'org.jetbrains.kotlinx:kotlinx-coroutines-core:' + COROUTINES_VERSION,
+            coroutinesAndroid       : 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + COROUTINES_VERSION,
+            coroutinesJDK8          : 'org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:' + COROUTINES_VERSION,
 
             alibabaArouterApi       : 'com.alibaba:arouter-api:' + ALIBABA_AROUTER_API_VERSION,
             alibabaArouterCompiler  : 'com.alibaba:arouter-compiler:' + ALIBABA_AROUTER_COMPILER_VERSION,

@@ -1,3 +1,4 @@
+include ':chwsdblib'
 include ':blemodule'
 include ':FastBleLib'
 include ':CommonLib'
