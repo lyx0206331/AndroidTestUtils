@@ -97,14 +97,14 @@ dependencies {
     implementation rootProject.ext.dependencies.androidXLifecycleViewModelKtx
     implementation rootProject.ext.dependencies.androidXLifecycleLiveDataKtx
     implementation rootProject.ext.dependencies.MPAndroidChart
-    implementation 'androidx.appcompat:appcompat:1.1.0@aar'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0@aar'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation project(path: ':FastBleLib')
     implementation project(path: ':CommonLib')
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation rootProject.ext.dependencies.ankoAll
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    testImplementation 'junit:junit:4.13'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 

@@ -297,5 +297,5 @@ data class IMUEntity(
     val value16: UShort, val value17: UShort
 ) {
     fun valuesString() =
-        "$imuSysState $modeState $attResult $value1 $value2 $value3 $value4 $value5 $value6 $value7 $value8 $value9 $value10 $value11 $value12 $value13 $value14 $value15 $value16 $value17"
+        "$imuSysState\t$modeState\t$attResult\t$value1\t$value2\t$value3\t$value4\t$value5\t$value6\t$value7\t$value8\t$value9\t$value10\t$value11\t$value12\t$value13\t$value14\t$value15\t$value16\t$value17"
 }

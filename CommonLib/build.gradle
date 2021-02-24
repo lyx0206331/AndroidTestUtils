@@ -33,7 +33,7 @@ android {
 
 dependencies {
     api fileTree(dir: "libs", include: ["*.jar"])
-    api 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.20'
+    api 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.30'
     implementation rootProject.ext.dependencies.androidXAppcompat
     implementation rootProject.ext.dependencies.androidXConstraintLayout
     implementation rootProject.ext.dependencies.androidXCore

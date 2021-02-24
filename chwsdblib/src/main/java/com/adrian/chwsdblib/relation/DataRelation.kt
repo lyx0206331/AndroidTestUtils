@@ -1,8 +1,9 @@
-package com.adrian.chwsdblib.base
+package com.adrian.chwsdblib.relation
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.Embedded
+import androidx.room.Relation
+import com.adrian.chwsdblib.entity.FileBriefInfo
+import com.adrian.chwsdblib.entity.FileDetailInfo
 
 //                       _ooOoo_
 //                      o8888888o
@@ -27,21 +28,11 @@ import androidx.room.PrimaryKey
 //             佛祖保佑             永无BUG
 /**
  * author:RanQing
- * date:2021/1/5 0005 16:01
+ * date:2021/2/24 0024 15:49
  * description:
  */
-@Entity(tableName = "user_info")
-class UserInfoEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    @ColumnInfo(name = "record_no") val recordNo: String,
-    @ColumnInfo(name = "owner_id") val ownerId: String,
-    @ColumnInfo(name = "affected_side") val affectedSide: Byte,
-    val name: String,
-    val age: Int,
-    val gender: Byte,
-    @ColumnInfo(name = "pro_gear_type") val proGearType: Byte,
-    @ColumnInfo(name = "walk_type") val walkType: Byte,
-    @ColumnInfo(name = "create_time") val createTime: Long,
-    @ColumnInfo(name = "device_id") val deviceId: String,
-    val cause: String
+data class BriefAndDetail(
+    @Embedded val brief: FileBriefInfo,
+    @Relation(parentColumn = "id", entityColumn = "brief_id")
+    val detail: FileDetailInfo
 )
