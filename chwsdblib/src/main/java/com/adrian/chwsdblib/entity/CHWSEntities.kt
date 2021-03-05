@@ -37,63 +37,63 @@ import androidx.room.PrimaryKey
     indices = [Index(value = ["account_id", "hospital_no"], unique = true)]
 )
 data class AccountInfo(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    @PrimaryKey @ColumnInfo(name = "account_id") val accountId: String,
-    @ColumnInfo(name = "hospital_no") val hospitalNo: String,
-    @ColumnInfo(name = "department_no") val departmentNo: String,
-    val type: Byte
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @ColumnInfo(name = "account_id") var accountId: String,
+    @ColumnInfo(name = "hospital_no") var hospitalNo: String,
+    @ColumnInfo(name = "department_no") var departmentNo: String,
+    var type: Byte
 )
 
-@Entity(tableName = "patient_info", indices = [Index(value = ["record_id"], unique = true)])
+@Entity(tableName = "patient_info", indices = [Index(value = ["record_num"], unique = true)])
 data class PatientInfo(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    @PrimaryKey @ColumnInfo(name = "record_no") val recordNo: String,
-    @ColumnInfo(name = "account_id") val accountId: String,
-    @ColumnInfo(name = "affected_side") val affectedSide: Byte,
-    val name: String,
-    val age: Int,
-    val gender: Byte,
-    @ColumnInfo(name = "pro_gear_type") val proGearType: Byte,
-    @ColumnInfo(name = "walk_type") val walkType: Byte,
-    @ColumnInfo(name = "create_time") val createTime: Long,
-    @ColumnInfo(name = "device_id") val deviceId: String,   //SN
-    val cause: String
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @ColumnInfo(name = "record_num") var recordNum: String,
+    @ColumnInfo(name = "account_id") var accountId: String,
+    @ColumnInfo(name = "affected_side") var affectedSide: Byte,
+    var name: String,
+    @ColumnInfo(defaultValue = "0") var age: Int,
+    @ColumnInfo(defaultValue = "0") var gender: Byte,
+    @ColumnInfo(name = "pro_gear_type") var proGearType: Byte,
+    @ColumnInfo(name = "walk_type") var walkType: Byte,
+    @ColumnInfo(name = "create_time") var createTime: Long,
+    @ColumnInfo(name = "device_id") var deviceId: String,   //SN
+    var cause: String
 )
 
-@Entity(tableName = "file_brief_info", indices = [Index(value = ["detail_id"], unique = true)])
+@Entity(tableName = "file_brief_info", indices = [Index(value = ["file_name"], unique = true)])
 data class FileBriefInfo(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-//    @PrimaryKey @ColumnInfo(name = "file_id") val fileId: String,
-    @ColumnInfo(name = "detail_id") val detailId: Int,
-    @ColumnInfo(name = "record_no") val recordNo: String,
-    @ColumnInfo(name = "account_id") val accountId: String,
-    @ColumnInfo(name = "file_name") val fileName: String,
-    @ColumnInfo(name = "create_time") val createTime: Long
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+//    @PrimaryKey @ColumnInfo(name = "file_id") var fileId: String,
+//    @ColumnInfo(name = "detail_id") var detailId: Int,
+    @ColumnInfo(name = "record_num") var recordNum: String,
+    @ColumnInfo(name = "account_id") var accountId: String,
+    @ColumnInfo(name = "file_name") var fileName: String,
+    @ColumnInfo(name = "create_time", defaultValue = "0") var createTime: Long
 )
 
-@Entity(tableName = "file_detail_info", indices = [Index(value = ["brief_id"], unique = true)])
-data class FileDetailInfo(
-//    @PrimaryKey(autoGenerate = true) val id: Int,
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "brief_id") val briefId: Int,
-    @ColumnInfo(name = "test_time") val testTime: Long, //millis
-    @ColumnInfo(name = "test_time_len") val testTimeLen: Int,   //min
-    @ColumnInfo(name = "test_distance") val testDistance: Int, //m
-    @ColumnInfo(name = "step_count") val stepCount: Int,
-    val speed: Float,   //m/s
-    @ColumnInfo(name = "left_step_len") val leftStepLen: Int,   //mm
-    @ColumnInfo(name = "right_step_len") val rightStepLen: Int, //mm
-    @ColumnInfo(name = "step_stride") val stepStride: Int, //mm
-    @ColumnInfo(name = "step_cadence") val stepCadence: Int,    //step/s
-    @ColumnInfo(name = "left_swing_time") val leftSwingTime: Int,   //s
-    @ColumnInfo(name = "right_swing_time") val rightSwingTime: Int, //s
-    @ColumnInfo(name = "left_brace_time") val leftBraceTime: Int,   //s
-    @ColumnInfo(name = "right_brace_time") val rightBraceTime: Int, //s
-    @ColumnInfo(name = "left_brace_swing_ratio") val leftBraceSwingRatio: Float,    //%
-    @ColumnInfo(name = "right_brace_swing_ratio") val rightBraceSwingRatio: Float,  //%
-    @ColumnInfo(name = "double_brace_time") val doubleBraceTime: Int,   //s
-    @ColumnInfo(name = "gait_cycle") val gaitCycle: Int,    //s
-    @ColumnInfo(name = "lr_brace_time_ratio") val lrBraceTimeRatio: Float,  //%
-    @ColumnInfo(name = "lr_swing_time_ratio") val lrSwingTimeRatio: Float,  //%
-    @ColumnInfo(name = "symmetry_test_time") val symmetryTestTime: Int, //min
-    @ColumnInfo(name = "symmetry_average_speed") val symmetryAverageSpeed: Float  //m/s
+@Entity(tableName = "analysis_result_info", indices = [Index(value = ["brief_id"], unique = true)])
+data class AnalysisResultInfo(
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @ColumnInfo(name = "brief_id") var briefId: Int = 0,
+    @ColumnInfo(name = "test_time") var testTime: Long = 0, //millis
+    @ColumnInfo(name = "test_time_len") var testTimeLen: Int = 0,   //min
+    @ColumnInfo(name = "test_distance") var testDistance: Int = 0, //m
+    @ColumnInfo(name = "step_count") var stepCount: Int = 0,
+    var speed: Float = 0f,   //m/s
+    @ColumnInfo(name = "left_step_len") var leftStepLen: Int = 0,   //mm
+    @ColumnInfo(name = "right_step_len") var rightStepLen: Int = 0, //mm
+    @ColumnInfo(name = "step_stride") var stepStride: Int = 0, //mm
+    @ColumnInfo(name = "step_cadence") var stepCadence: Int = 0,    //step/s
+    @ColumnInfo(name = "left_swing_time") var leftSwingTime: Int = 0,   //s
+    @ColumnInfo(name = "right_swing_time") var rightSwingTime: Int = 0, //s
+    @ColumnInfo(name = "left_brace_time") var leftBraceTime: Int = 0,   //s
+    @ColumnInfo(name = "right_brace_time") var rightBraceTime: Int = 0, //s
+    @ColumnInfo(name = "left_brace_swing_ratio") var leftBraceSwingRatio: Float = 0f,    //%
+    @ColumnInfo(name = "right_brace_swing_ratio") var rightBraceSwingRatio: Float = 0f,  //%
+    @ColumnInfo(name = "double_brace_time") var doubleBraceTime: Int = 0,   //s
+    @ColumnInfo(name = "gait_cycle") var gaitCycle: Int = 0,    //s
+    @ColumnInfo(name = "lr_brace_time_ratio") var lrBraceTimeRatio: Float = 0f,  //%
+    @ColumnInfo(name = "lr_swing_time_ratio") var lrSwingTimeRatio: Float = 0f,  //%
+    @ColumnInfo(name = "symmetry_test_time") var symmetryTestTime: Int = 0, //min
+    @ColumnInfo(name = "symmetry_average_speed") var symmetryAverageSpeed: Float = 0f  //m/s
 )

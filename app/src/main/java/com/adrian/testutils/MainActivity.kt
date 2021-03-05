@@ -13,8 +13,8 @@ import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
-    private val permissionUtil: PermissionUtil by lazy { PermissionUtil(this) }
-    private val permissions = arrayOf(
+    private var permissionUtil: PermissionUtil by lazy { PermissionUtil(this) }
+    private var permissions = arrayOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
@@ -43,11 +43,11 @@ class MainActivity : AppCompatActivity() {
             object : PermissionUtil.IPermissionCallback {
                 override fun allowedPermissions() {
                     thread {
-                        val data =
+                        var data =
                             ExoLogUtil.parseLogFile("${Environment.getExternalStorageDirectory().absolutePath}/chws/Test/t20210105113711_u30032_hnlsyy5710_m00000000540040010000005001003500_i10165320191106_l.txt")
                         runOnUiThread {
 //                                showShortToast(JSONArray.toJSON(data).toString())
-                            val content = JSONArray.toJSON(data).toString()
+                            var content = JSONArray.toJSON(data).toString()
                             tvContent.text = content
                             "parseLog".logE(content)
                         }

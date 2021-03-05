@@ -49,6 +49,7 @@ ext {
 
     def X_ROOM_VERSION = "2.2.5"
     def X_LIFECYCLE_VERSION = "2.2.0"
+    def X_WORK_VERSION = "2.5.0"
 
     def ANKO_VERSION = "0.10.8"
 
@@ -102,6 +103,7 @@ ext {
             androidXNavigationFragment: 'androidx.navigation:navigation-fragment-ktx:' + X_NAV_FRAGMENT_VERSION,
             androidXNavigationUI    : 'androidx.navigation:navigation-ui-ktx:' + X_NAV_UI_VERSION,
 
+            //ROOM
             androidXRoomRuntime     : 'androidx.room:room-runtime:' + X_ROOM_VERSION,
             androidXRoomCompiler    : 'androidx.room:room-compiler:' + X_ROOM_VERSION,
             // optional - Kotlin Extensions and Coroutines support for Room
@@ -117,6 +119,15 @@ ext {
             androidXLifecycleCompiler: 'androidx.lifecycle:lifecycle-compiler:' + X_LIFECYCLE_VERSION,
             androidXLifecycleViewModelKtx: 'androidx.lifecycle:lifecycle-viewmodel-ktx:' + X_LIFECYCLE_VERSION,
             androidXLifecycleLiveDataKtx: 'androidx.lifecycle:lifecycle-livedata-ktx:' + X_LIFECYCLE_VERSION,
+
+            //WorkManager
+            androidXWorkRuntime: 'androidx.work:work-runtime:' + X_WORK_VERSION,    // java only
+            androidXWorkRuntimeRtx: 'androidx.work:work-runtime-ktx:' + X_WORK_VERSION, // kotlin + coroutines
+            androidXWorkRxjava2:    'androidx.work:work-rxjava2:' + X_WORK_VERSION, // optional - RxJava2 support
+            androidXWorkRxjava3:    'androidx.work:work-rxjava3:' + X_WORK_VERSION, // optional - RxJava3 support
+            androidXWorkGcm:    'androidx.work:work-gcm:' + X_WORK_VERSION, // optional - GCMNetworkManager support
+            androidXWorkMultiprocess:   'androidx.work:work-multiprocess:' + X_WORK_VERSION,    // optional - Multiprocess support
+            androidXWorkTesting:    'androidx.work:work-testing:' + X_WORK_VERSION, // optional - Test helpers
 
             ankoAll                 : 'org.jetbrains.anko:anko:' + ANKO_VERSION,
 

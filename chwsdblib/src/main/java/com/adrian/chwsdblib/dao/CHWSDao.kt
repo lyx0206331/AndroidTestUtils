@@ -2,9 +2,12 @@ package com.adrian.chwsdblib.dao
 
 import androidx.room.*
 import com.adrian.chwsdblib.entity.AccountInfo
+import com.adrian.chwsdblib.entity.AnalysisResultInfo
+import com.adrian.chwsdblib.entity.FileBriefInfo
 import com.adrian.chwsdblib.entity.PatientInfo
-import com.adrian.chwsdblib.relation.BriefAndDetail
-import kotlinx.coroutines.flow.Flow
+import com.adrian.chwsdblib.relation.AccountWithPatients
+import com.adrian.chwsdblib.relation.BriefAndAnalysis
+import com.adrian.chwsdblib.relation.PatientWithBriefs
 
 //                       _ooOoo_
 //                      o8888888o
@@ -34,34 +37,84 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface CHWSDao {
+    /**
+     * 插入账户
+     */
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAccount(vararg accounts: AccountInfo): Flow<List<Long>>
+    fun insertAccount(accounts: AccountInfo): Long
 
     @Delete
-    suspend fun deleteAccounts(vararg accounts: AccountInfo): Int
+    fun deleteAccounts(accounts: List<AccountInfo>): Int
 
     @Update
-    suspend fun updateAccounts(vararg accounts: AccountInfo): Int
+    fun updateAccount(account: AccountInfo): Int
 
-    @Query("SELECT * FROM account_info WHERE account_id IN (:ids)")
-    suspend fun queryAccountsByIds(vararg ids: String): Flow<List<AccountInfo>>
+    @Query("SELECT * FROM account_info WHERE account_id = :id")
+    fun queryAccountById(id: String): AccountInfo
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertPatients(vararg patients: PatientInfo): List<Long>
+    fun insertPatient(patient: PatientInfo): Long
 
     @Delete
-    suspend fun deletePatients(vararg patients: PatientInfo): Int
+    fun deletePatients(patients: List<PatientInfo>): Int
 
     @Update
-    suspend fun updatePatients(vararg patients: PatientInfo): Int
+    fun updatePatient(patient: PatientInfo): Int
 
-    @Query("SELECT * FROM patient_info WHERE record_no IN (:recordNums)")
-    suspend fun queryPatientsByRecordNums(vararg recordNums: String): Flow<List<PatientInfo>>
+    @Query("SELECT * FROM patient_info")
+    fun queryPatientsAll(): List<PatientInfo>
 
-    @Query("SELECT * FROM patient_info WHERE name IN (:recordNames)")
-    suspend fun queryPatientsByNames(vararg recordNames: String): Flow<List<PatientInfo>>
+    @Query("SELECT * FROM patient_info WHERE name = :name")
+    fun queryPatientsByName(name: String): List<PatientInfo>
+
+    @Query("SELECT * FROM patient_info WHERE account_id = :accountId")
+    fun queryPatientsByAccountId(accountId: String): List<PatientInfo>
+
+    @Query("SELECT * FROM patient_info WHERE record_num = :recordNum")
+    fun queryPatientByRecordNum(recordNum: String): PatientInfo
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    fun insertBrief(brief: FileBriefInfo): Long
+
+    @Delete
+    fun deleteBriefs(vararg briefs: FileBriefInfo): Int
+
+    @Update
+    fun updateBrief(brief: FileBriefInfo): Int
+
+    @Query("SELECT * FROM file_brief_info")
+    fun queryBriefsAll(): List<FileBriefInfo>
+
+    @Query("SELECT * FROM file_brief_info WHERE account_id = :accountId")
+    fun queryBriefsByAccountId(accountId: String): List<FileBriefInfo>
+
+    @Query("SELECT * FROM file_brief_info WHERE record_num = :recordNum ORDER BY create_time DESC")
+    fun queryBriefsByRecordNum(recordNum: String): List<FileBriefInfo>
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    fun insertAnalysisResult(analysisResultInfo: AnalysisResultInfo)
+
+    @Delete
+    fun deleteAnalysisResults(vararg results: AnalysisResultInfo): Int
+
+    @Update
+    fun updateAnalysisResult(result: AnalysisResultInfo): Int
+
+    @Query("SELECT * FROM analysis_result_info")
+    fun queryAnalysisResultsAll(): List<AnalysisResultInfo>
+
+    @Query("SELECT * FROM analysis_result_info WHERE brief_id = :briefId")
+    fun queryAnalysisResultById(briefId: Int): AnalysisResultInfo
 
     @Transaction
-    @Query("SELECT * FROM file_brief_info WHERE record_no = :recordNum")
-    suspend fun queryBriefsAndDetails(recordNum: String): Flow<List<BriefAndDetail>>
+    @Query("SELECT * FROM file_brief_info WHERE id = :briefId")
+    fun queryBriefAndAnalysisResult(briefId: Int): BriefAndAnalysis
+
+    @Transaction
+    @Query("SELECT * FROM account_info WHERE account_id = :accountId")
+    fun queryAccountWithPatients(accountId: String): AccountWithPatients
+
+    @Transaction
+    @Query("SELECT * FROM patient_info WHERE record_num = :recordNum")
+    fun queryPatientWithBriefs(recordNum: String): PatientWithBriefs
 }
