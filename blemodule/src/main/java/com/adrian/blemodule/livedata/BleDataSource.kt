@@ -32,17 +32,17 @@ import kotlinx.coroutines.CoroutineDispatcher
  * description:
  */
 class BleDataVM() : ViewModel() {
-    var speed: MutableLiveData<Int>
+    val speed: MutableLiveData<Int>
         get() = TODO("Not yet implemented")
-    var totalSize: MutableLiveData<Int>
+    val totalSize: MutableLiveData<Int>
         get() = TODO("Not yet implemented")
-    var lastData: MutableLiveData<ByteArray>
+    val lastData: MutableLiveData<ByteArray>
         get() = TODO("Not yet implemented")
-    var needSave: MutableLiveData<Boolean>
+    val needSave: MutableLiveData<Boolean>
         get() = TODO("Not yet implemented")
-    var fileName: MutableLiveData<String>
+    val fileName: MutableLiveData<String>
         get() = TODO("Not yet implemented")
-    var totalReceiveTime: MutableLiveData<Long>
+    val totalReceiveTime: MutableLiveData<Long>
         get() = TODO("Not yet implemented")
 
     fun startReceive() {

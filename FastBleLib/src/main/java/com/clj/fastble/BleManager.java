@@ -51,7 +51,7 @@ public class BleManager {
     private static final int DEFAULT_MAX_MULTIPLE_DEVICE = 7;
     private static final int DEFAULT_OPERATE_TIME = 5000;
     private static final int DEFAULT_CONNECT_RETRY_COUNT = 0;
-    private static final int DEFAULT_CONNECT_RETRY_INTERvar = 5000;
+    private static final int DEFAULT_CONNECT_RETRY_INTERVAL = 5000;
     private static final int DEFAULT_MTU = 23;
     private static final int DEFAULT_MAX_MTU = 512;
     private static final int DEFAULT_WRITE_DATA_SPLIT_COUNT = 20;
@@ -60,7 +60,7 @@ public class BleManager {
     private int maxConnectCount = DEFAULT_MAX_MULTIPLE_DEVICE;
     private int operateTimeout = DEFAULT_OPERATE_TIME;
     private int reConnectCount = DEFAULT_CONNECT_RETRY_COUNT;
-    private long reConnectIntervar = DEFAULT_CONNECT_RETRY_INTERVAL;
+    private long reConnectInterval = DEFAULT_CONNECT_RETRY_INTERVAL;
     private int splitWriteNum = DEFAULT_WRITE_DATA_SPLIT_COUNT;
     private long connectOverTime = DEFAULT_CONNECT_OVER_TIME;
 
@@ -217,10 +217,10 @@ public class BleManager {
     public BleManager setReConnectCount(int count, long interval) {
         if (count > 10)
             count = 10;
-        if (intervar < 0)
-            intervar = 0;
+        if (interval < 0)
+            interval = 0;
         this.reConnectCount = count;
-        this.reConnectIntervar = interval;
+        this.reConnectInterval = interval;
         return this;
     }
 

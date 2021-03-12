@@ -39,4 +39,10 @@ data class BleUUID private constructor(
     }
 
     private constructor() : this(null, null, null)
+
+    fun createExample() {
+        serviceUUID = UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb")
+        charactWriteUUID = UUID.fromString("0000fff3-0000-1000-8000-00805f9b34fb")
+        charactNotifyUUID = UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb")
+    }
 }

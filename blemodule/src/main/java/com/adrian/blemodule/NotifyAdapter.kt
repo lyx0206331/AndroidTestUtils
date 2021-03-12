@@ -206,7 +206,7 @@ class NotifyAdapter(val context: Context) :
                         ssb.setSpan(
                             ForegroundColorSpan(context.resources.getColor(colorResId)),
                             4,
-                            holder.tvRssi.text.length,
+                            ssb.length,
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                         )
                         holder.tvRssi.text = ssb
@@ -254,40 +254,40 @@ class NotifyAdapter(val context: Context) :
                                     }
                                 }
                             })
-                                    } else {
-                                        bleDeviceInfo.stopReceive()
-                                        holder.tvReceiveTimeLen.text = "总接收时长:${bleDeviceInfo.totalReceiveTime}ms"
-                                        BleManager.getInstance().stopNotify(
-                                            this@apply,
-                                            bleDeviceInfo.serviceUUID.toString(),
-                                            bleDeviceInfo.notifyUUID.toString()
-                                        )
-                                    }
-                                }
-                                holder.btnSave.onClick {
+                    } else {
+                        bleDeviceInfo.stopReceive()
+                        holder.tvReceiveTimeLen.text = "总接收时长:${bleDeviceInfo.totalReceiveTime}ms"
+                        BleManager.getInstance().stopNotify(
+                            this@apply,
+                            bleDeviceInfo.serviceUUID.toString(),
+                            bleDeviceInfo.notifyUUID.toString()
+                        )
+                    }
+                }
+                holder.btnSave.onClick {
 //                                    if (!bleDeviceInfo.needSave && holder.switchNotify.isChecked) {
 //                                        context.showShortToast("请先关闭接收通知")
 //                                        return@onClick
 //                                    }
-                                    val fileName = holder.etFileName.text
-                                    if (fileName.isNullOrEmpty() || fileName.trim()
-                                            .isNullOrEmpty()
-                                    ) {
-                                        holder.btnSave.context.showShortToast("请输入文件名")
-                                    } else {
-                                        bleDeviceInfo.needSave = !bleDeviceInfo.needSave
-                                        if (bleDeviceInfo.needSave) {
-                                            bleDeviceInfo.fileName = fileName.toString()
-                                            context.showShortToast("开始保存数据")
-                                            holder.btnSave.text = "停止保存"
-                                        } else {
-                                            context.showShortToast("停止保存数据")
-                                            holder.btnSave.text = "开始保存"
-                                            holder.tvReceiveTimeLen.text =
-                                                "总接收时长:${bleDeviceInfo.totalReceiveTime}ms"
-                                        }
-                                    }
-                                }
+                    val fileName = holder.etFileName.text
+                    if (fileName.isNullOrEmpty() || fileName.trim()
+                            .isNullOrEmpty()
+                    ) {
+                        holder.btnSave.context.showShortToast("请输入文件名")
+                    } else {
+                        bleDeviceInfo.needSave = !bleDeviceInfo.needSave
+                        if (bleDeviceInfo.needSave) {
+                            bleDeviceInfo.fileName = fileName.toString()
+                            context.showShortToast("开始保存数据")
+                            holder.btnSave.text = "停止保存"
+                        } else {
+                            context.showShortToast("停止保存数据")
+                            holder.btnSave.text = "开始保存"
+                            holder.tvReceiveTimeLen.text =
+                                "总接收时长:${bleDeviceInfo.totalReceiveTime}ms"
+                        }
+                    }
+                }
                 holder.btnClear.onClick {
                     bleDeviceInfo.totalSize = 0
                     holder.tvData.text = ""
