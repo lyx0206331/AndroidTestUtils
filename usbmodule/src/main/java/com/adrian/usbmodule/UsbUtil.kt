@@ -9,9 +9,12 @@ import android.hardware.usb.*
 import com.chwishay.commonlib.tools.logE
 import com.chwishay.commonlib.tools.orDefault
 import com.chwishay.commonlib.tools.showShortToast
+import kotlinx.coroutines.delay
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.concurrent.thread
+import kotlin.math.ceil
+import kotlin.math.min
 
 //                       _ooOoo_
 //                      o8888888o
@@ -179,7 +182,23 @@ class UsbUtil {
         isOpenPort = false
     }
 
-    fun writeMsg(bytes: ByteArray) = usbConnection?.bulkTransfer(usbEndpointOut, bytes, bytes.size, 500)
+    private fun write(bytes: ByteArray) =
+        usbConnection?.bulkTransfer(usbEndpointOut, bytes, bytes.size, 500).orDefault(-1)
+
+    suspend fun write2Usb(data: ByteArray, pkgSize: Int) {
+        val pkgNum = ceil(data.size.toFloat() / pkgSize).toInt()
+        for (i in 0 until pkgNum) {
+            val d = data.copyOfRange(i * pkgSize, min((i + 1) * pkgSize, data.size))
+            val size = write(d)
+            usbCallback?.outputData(d, d.size * 100 / data.size)
+            if (size < 0) {
+                usbCallback?.onException(msg = "升级失败,请点击重试!")
+                return
+            }
+            delay(20)
+        }
+        usbCallback?.onSuccess(false)
+    }
 
     fun readMsg(device: UsbDevice?) {
         if (isOpenPort || openPort(device)) {
@@ -230,11 +249,12 @@ class UsbUtil {
                                         ).decodeToString() else "长度不足4个字节"
                                     }, 时间：${System.currentTimeMillis()}"
                                 )
-                                usbCallback?.outputData(bytes)
+                                usbCallback?.inputData(bytes, -1)
                             }
                         }
                     }
                 }
+                usbCallback?.onSuccess(true)
             }
         }
     }
@@ -279,6 +299,9 @@ class UsbUtil {
 
     interface IUsbCallback {
         fun outputLog(msg: String?)
-        fun outputData(bytes: ByteArray)
+        fun outputData(bytes: ByteArray, progress: Int = -1)
+        fun inputData(bytes: ByteArray, progress: Int = -1)
+        fun onSuccess(isInput: Boolean)
+        fun onException(e: Exception? = null, msg: String? = null)
     }
 }

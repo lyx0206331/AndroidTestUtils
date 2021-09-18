@@ -42,7 +42,11 @@ class MainActivity : AppCompatActivity() {
                 appendCotent(msg)
             }
 
-            override fun outputData(bytes: ByteArray) {
+            override fun outputData(bytes: ByteArray, progress: Int) {
+
+            }
+
+            override fun inputData(bytes: ByteArray, progress: Int) {
                 if (bytes.isEmpty()) {
                     transStopTime = System.currentTimeMillis()
                     appendCotent("结束数据传输:$transStopTime")
@@ -52,6 +56,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 totalDataLength += bytes.size
                 writeSrc2File("w66_$createTime", bytes)
+            }
+
+            override fun onSuccess(isInput: Boolean) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onException(e: Exception?, msg: String?) {
+                e?.printStackTrace()
             }
         }
 
