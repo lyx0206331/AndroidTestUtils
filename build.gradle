@@ -13,7 +13,7 @@ def getReleaseKeystore() {
     } else if (os.isLinux()) {
         return '/home/adrian/Dev/Android/appkey.keystore'
     } else if (os.isMacOsX()) {
-        return ''
+        return '/Users/dev/Develop/Android/appkey.keystore'
     } else {
         return ''
     }
@@ -26,7 +26,7 @@ def getDebugKeystore() {
     } else if (os.isLinux()) {
         return '/home/adrian/Dev/Android/debug.keystore'
     } else if (os.isMacOsX()) {
-        return ''
+        return '/Users/dev/Develop/Android/debug.keystore'
     } else {
         return ''
     }

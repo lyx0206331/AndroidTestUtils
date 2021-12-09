@@ -13,7 +13,7 @@ import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
-    private var permissionUtil: PermissionUtil by lazy { PermissionUtil(this) }
+    private val permissionUtil: PermissionUtil by lazy { PermissionUtil(this) }
     private var permissions = arrayOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_EXTERNAL_STORAGE
